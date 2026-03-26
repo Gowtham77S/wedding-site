@@ -49,20 +49,23 @@ body {
 	width: auto;
 	object-fit: contain;
 	filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.28));
-	opacity: 0.96;
-	/* gentle horizontal motion (left-right) */
-	animation: diva-sway 6s ease-in-out infinite alternate;
+	opacity: 0; /* start hidden — enter animation will reveal */
+	transform-origin: top center;
+	backface-visibility: hidden;
+	will-change: transform, opacity, left, right;
 }
 
 .hanging-diva-left {
 	left: 0;
+	/* slide in from left, then begin gentle sway */
+	animation: diva-enter-left 2s ease-out 0s forwards, diva-sway 6s ease-in-out 0.9s infinite alternate;
 }
 
 .hanging-diva-right {
 	right: 0;
 	transform: scaleX(-1);
-	/* offset phase so the two divas drift slightly out of sync */
-	animation-delay: 0.35s;
+	/* slide in from right (keeps mirrored flip), then sway out of phase */
+	animation: diva-enter-right 2s ease-out 0s forwards,  6s ease-in-out 0.9s infinite alternate;
 }
 
 @keyframes diva-sway {
@@ -77,7 +80,18 @@ body {
 	100% { transform: scaleX(-1) translateX(-6%); }
 }
 
-.hanging-diva-right { animation-name: diva-sway-flip; }
+/* Entrance animations: slide the divas in from the sides and fade in */
+@keyframes diva-enter-left {
+	0% { left: -40%; opacity: 0; }
+	70% { left: 6%; opacity: 1; }
+	100% { left: 0%; opacity: 1; }
+}
+
+@keyframes diva-enter-right {
+	0% { right: -40%; opacity: 0; }
+	70% { right: 6%; opacity: 1; }
+	100% { right: 0%; opacity: 1; }
+}
 
 @media (prefers-reduced-motion: reduce) {
 	.hanging-diva { animation: none; }
@@ -519,19 +533,32 @@ body {
 	width: auto;
 	object-fit: contain;
 	filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.25));
-	opacity: 0.92;
+	opacity: 0; /* start hidden — will enter from sides */
+	transform-origin: top center;
+	backface-visibility: hidden;
+	will-change: transform, opacity, left, right;
 }
 
 .events-diva-left {
 	left: 0;
-	animation: diva-sway 6s ease-in-out infinite alternate;
+	/* don't run automatically on page load; trigger when section gets .in-view */
+	animation: none;
 }
 
 .events-diva-right {
 	right: 0;
 	transform: scaleX(-1);
-	animation: diva-sway-flip 6s ease-in-out infinite alternate;
-	animation-delay: 0.35s;
+	/* don't run automatically on page load; trigger when section gets .in-view */
+	animation: none;
+	animation-delay: 0s;
+}
+
+/* Start event divas entrance when events section is revealed (IntersectionObserver adds .in-view) */
+.events-section.in-view .events-diva-left {
+	animation: diva-enter-left 0.9s ease-out 0s forwards, diva-sway 3s ease-in-out 1.0s infinite alternate;
+}
+.events-section.in-view .events-diva-right {
+	animation: diva-enter-right 0.9s ease-out 0s forwards, diva-sway-flip 3s ease-in-out 1.0s infinite alternate;
 }
 
 .events-subtitle {
@@ -1020,4 +1047,76 @@ body {
 /* small prefers-reduced-motion handling */
 @media (prefers-reduced-motion: reduce) {
 	[data-animate] { transition: none; transform: none; opacity: 1; }
+}
+
+/* ========== Floating PDF Download Button ========== */
+.pdf-btn {
+	position: fixed;
+	bottom: 28px;
+	right: 28px;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 14px 22px;
+	background: linear-gradient(135deg, #8B1A1A, #C0392B);
+	color: #FFD97D;
+	border: 2px solid #C9A84C;
+	border-radius: 50px;
+	font-family: 'Cinzel', serif;
+	font-size: 0.95rem;
+	letter-spacing: 0.06em;
+	cursor: pointer;
+	box-shadow: 0 6px 24px rgba(139,26,26,0.35);
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pdf-btn:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 32px rgba(139,26,26,0.45);
+}
+
+.pdf-btn svg {
+	flex-shrink: 0;
+}
+
+/* ========== Print / PDF Styles ========== */
+@media print {
+	/* Show all hidden elements (animations) */
+	[data-animate] {
+		opacity: 1 !important;
+		transform: none !important;
+	}
+
+	/* Preserve background colors/images */
+	* {
+		-webkit-print-color-adjust: exact !important;
+		print-color-adjust: exact !important;
+	}
+
+	/* Hide the download button itself */
+	.pdf-btn {
+		display: none !important;
+	}
+
+	/* Un-sticky the temple section */
+	.temple-track {
+		position: relative !important;
+		top: auto !important;
+		height: auto !important;
+	}
+
+	.temple-section {
+		height: auto !important;
+	}
+
+	/* Avoid page cuts mid-card */
+	.event-card,
+	.date-card,
+	.venue-info,
+	.family-panel-content,
+	.rsvp-form {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
 }
