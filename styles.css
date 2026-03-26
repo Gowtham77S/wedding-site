@@ -65,7 +65,7 @@ body {
 	right: 0;
 	transform: scaleX(-1);
 	/* slide in from right (keeps mirrored flip), then sway out of phase */
-	animation: diva-enter-right 2s ease-out 0s forwards,  6s ease-in-out 0.9s infinite alternate;
+	animation: diva-enter-right 2s ease-out 0s forwards, diva-sway 6s ease-in-out 0.9s infinite alternate;
 }
 
 @keyframes diva-sway {
@@ -149,7 +149,7 @@ body {
 
 .title-wrap {
 	position: absolute;
-	top: 50%;
+	top: 30%;
 	left: 50%;
 	transform: translateX(-50%);
 	text-align: center;
@@ -201,7 +201,7 @@ body {
 	.temple-img { height: 65vh; width: auto; }
 
 	.title-wrap {
-		top: 50%;
+		top: 30%;
 		width: min(74vw, 360px);
 		border-radius: 36px;
 	}
