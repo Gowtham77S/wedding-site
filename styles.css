@@ -13,7 +13,12 @@ body {
 body {
 	overflow-x: hidden;
 	overflow-y: auto;
-	background: #7cc7f7;
+	/* fallback color + floral background image */
+	background-color: #7cc7f7;
+	background-image: url("assets/flower_bg.png");
+	background-position: center top;
+	background-repeat: no-repeat;
+	background-size: cover;
 	font-family: 'Cinzel', serif;
 }
 
